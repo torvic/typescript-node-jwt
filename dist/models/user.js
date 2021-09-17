@@ -33,7 +33,14 @@ userSchema.pre('save', function (next) {
         if (!user.isModified('password'))
             return next();
         const salt = yield bcrypt_1.default.genSalt(10);
-        bcrypt_1.default.hash(user.password, salt);
+        const hash = yield bcrypt_1.default.hash(user.password, salt);
+        user.password = hash;
+        next();
     });
 });
+userSchema.methods.comparePassword = function (password) {
+    return __awaiter(this, void 0, void 0, function* () {
+        return yield bcrypt_1.default.compare(password, this.password);
+    });
+};
 exports.default = (0, mongoose_1.model)('user', userSchema);
